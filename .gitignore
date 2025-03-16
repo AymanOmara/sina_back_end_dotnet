@@ -1,0 +1,66 @@
+# Build directories
+**/bin/
+**/obj/
+
+
+# User-specific files
+*.userprefs
+*.user
+*.suo
+*.vscode
+*.vs
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Generated files
+*.apk
+*.aab
+*.ipa
+*.app
+*.exe
+*.dll
+*.pdb
+*.mdb
+*.zip
+*.tar.gz
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.assets.json
+
+# Xamarin specific
+*.xcodeproj/
+*.xcworkspace/
+*.xcuserstate
+*.xcuserdata/
+*.csproj.user
+*.csproj.filters
+*.sln.ide
+
+# IDE temp files
+.idea/
+*.sln.DotSettings.user
+
+# Local config
+config.json
+secrets.json
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Node modules (if using React Native or other frontend tech)
+node_modules/
+
+# Python (if using scripts)
+__pycache__/
+*.pyc
+*.pyo
