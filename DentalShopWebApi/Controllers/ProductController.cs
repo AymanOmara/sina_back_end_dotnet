@@ -25,9 +25,16 @@ namespace DentalShopWebApi.Controllers
         }
 
         [HttpGet("GetProduct/{category}")]
-        public async Task<ActionResult<IEnumerable<Prouduct>>> GetProductsByCategoryId(string category)
+        public async Task<ActionResult<IEnumerable<Prouduct>>> GetProductsByCategoryId(string category, string firstYear = "F", string secondYear = "F", string thirdYear = "F", string forthYear = "F", string fifthYear = "F", string Clothes = "F", string Teeth = "F")
         {
-            return await _context.Prouducts.Where((pr) => pr.Type == category).ToListAsync();
+            return await _context.Prouducts.Where((pr) => pr.Type == category &&
+            firstYear=="T" ? pr.Firstyear=="T" : pr.Firstyear=="F" &&
+            secondYear == "T" ? pr.Secondyear == "T" : pr.Secondyear == "F" &&
+            thirdYear == "T" ? pr.Thirdyear == "T" : pr.Thirdyear == "F" &&
+            forthYear == "T" ? pr.Fourthyear == "T" : pr.Fourthyear == "F" &&
+            fifthYear == "T" ? pr.Fifthyear == "T" : pr.Fifthyear == "F" &&
+            Clothes == "T" ? pr.Clothes == "T" : pr.Clothes == "F" &&
+            Teeth == "T" ? pr.Teeth == "T" : pr.Teeth == "F" ).ToListAsync();
         }
 
         // POST: api/Product/AddProduct

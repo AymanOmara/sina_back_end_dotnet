@@ -25,7 +25,7 @@ namespace DentalShopWebApi.Controllers
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetUser", new { id = user.Userid }, user);
+            return Ok(user);
         }
 
         // PUT: api/User/UpdateAccountInfo/5
