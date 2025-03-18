@@ -27,10 +27,13 @@ namespace DentalShopWebApi.Controllers
         [HttpGet("GetProduct/{category}")]
         public async Task<ActionResult<List<Prouduct>>> GetProductsByCategoryId(string category, string firstYear = "F", string secondYear = "F", string thirdYear = "F", string forthYear = "F", string fifthYear = "F", string Clothes = "F", string Teeth = "F")
         {
-            var Query =  _context.Prouducts.Where(pr => pr.Type.ToLower().Trim() == category.ToLower().Trim());
+            var Query =  _context.Prouducts.AsQueryable();
+
+            if (category.ToLower().Trim() != "student")
+                Query = Query.Where(pr => pr.Type.ToLower().Trim() == category.ToLower().Trim());
 
             //apply filter
-            if(firstYear!="F")
+            if (firstYear!="F")
                 Query = Query.Where(pr => pr.Firstyear.ToLower().Trim() == firstYear.ToLower().Trim());
 
             if (secondYear != "F")
