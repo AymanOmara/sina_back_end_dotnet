@@ -33,7 +33,7 @@ namespace DentalShopWebApi.Controllers
         {
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetNotification", new { id = notification.Notificationid }, notification);
+            return Ok( notification);
         }
 
         // PUT: api/Notifications/MarkAsRead/5

@@ -30,7 +30,7 @@ namespace DentalShopWebApi.Controllers
         {
             _context.Panners.Add(panner);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetPanner", new { id = panner.Id }, panner);
+            return Ok( panner);
         }
     }
 }
