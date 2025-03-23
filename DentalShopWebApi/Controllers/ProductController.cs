@@ -1,4 +1,5 @@
-﻿using DentalShopWebApi.DAL;
+﻿using DentalShopWebApi.AllServices;
+using DentalShopWebApi.DAL;
 using DentalShopWebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace DentalShopWebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly db_aa382a_ibnsinadentalContext _context;
+        private readonly Services _services;
 
-        public ProductController(db_aa382a_ibnsinadentalContext context)
+        public ProductController(db_aa382a_ibnsinadentalContext context , Services services)
         {
             _context = context;
+            this._services = services;
         }
 
         // GET: api/Product
@@ -61,9 +64,21 @@ namespace DentalShopWebApi.Controllers
         [HttpPost("AddProduct")]
         public async Task<ActionResult<Prouduct>> AddProduct([FromBody] Prouduct product)
         {
+                string imageUrl = await _services.SaveImageAsync(product.Firstphoto, Guid.NewGuid(), "1", "product");
+                if (imageUrl == null)
+                    return BadRequest("Invalid image data");
+
+           
+            product.Firstphoto = imageUrl;
+            product.Secondphoto = imageUrl;
+            product.Thirdphoto = imageUrl;
+            product.Fourthphoto = imageUrl;
+            product.Fifthphoto = imageUrl;
+
             _context.Prouducts.Add(product);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetProduct", new { id = product.Productid }, product);
+
+            return Ok( product);
         }
 
         // POST: api/Product/AddFavorite
@@ -72,7 +87,7 @@ namespace DentalShopWebApi.Controllers
         {
             _context.Usersprouducts.Add(favorite);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetFavorite", new { id = favorite.Id }, favorite);
+            return Ok( favorite);
         }
 
         // DELETE: api/Product/DeleteFavorite/5
@@ -89,5 +104,73 @@ namespace DentalShopWebApi.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
+
+        // PUT: api/Product/UpdateProduct/5
+        [HttpPut("UpdateProduct/{id}")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] Prouduct updatedProduct)
+        {
+            if (id != updatedProduct.Productid)
+                return BadRequest("Product ID mismatch");
+
+            var existingProduct = await _context.Prouducts.FindAsync(id);
+            if (existingProduct == null)
+                return NotFound();
+
+            // Update fields
+            existingProduct.Prouductname = updatedProduct.Prouductname;
+            existingProduct.Type = updatedProduct.Type;
+            existingProduct.Firstyear = updatedProduct.Firstyear;
+            existingProduct.Secondyear = updatedProduct.Secondyear;
+            existingProduct.Thirdyear = updatedProduct.Thirdyear;
+            existingProduct.Fourthyear = updatedProduct.Fourthyear;
+            existingProduct.Fifthyear = updatedProduct.Fifthyear;
+            existingProduct.Clothes = updatedProduct.Clothes;
+            existingProduct.Teeth = updatedProduct.Teeth;
+            existingProduct.Price = updatedProduct.Price;
+
+            if (!string.IsNullOrEmpty(updatedProduct.Firstphoto))
+            {
+              var res = await  _services.DeleteImageAsync(updatedProduct.Firstphoto);
+                if (res)
+                {
+                    string imageUrl = await _services.SaveImageAsync(updatedProduct.Firstphoto, Guid.NewGuid(), "1", "product");
+                    if (imageUrl == null)
+                        return BadRequest("Invalid image data");
+
+                    existingProduct.Firstphoto = imageUrl;
+                    existingProduct.Secondphoto = imageUrl;
+                    existingProduct.Thirdphoto = imageUrl;
+                    existingProduct.Fourthphoto = imageUrl;
+                    existingProduct.Fifthphoto = imageUrl;
+
+                }
+
+            }
+
+            _context.Entry(existingProduct).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/Product/DeleteProduct/5
+        [HttpDelete("DeleteProduct/{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var product = await _context.Prouducts.FindAsync(id);
+            if (product == null)
+                return NotFound();
+
+            _context.Prouducts.Remove(product);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+
+
+
     }
+
 }

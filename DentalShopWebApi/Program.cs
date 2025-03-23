@@ -3,6 +3,7 @@
 using DentalShopWebApi.DAL;
 using DentalShopWebApi.Models;
 using Microsoft.EntityFrameworkCore;
+using DentalShopWebApi.AllServices;
 
 namespace DentalShopWebApi
 {
@@ -22,6 +23,19 @@ namespace DentalShopWebApi
             builder.Services.AddDbContext<db_aa382a_ibnsinadentalContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddScoped<Services>();
+
+            // Add CORS policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", policy =>
+                {
+                    policy.AllowAnyOrigin() // Allow requests from any origin
+                          .AllowAnyMethod() // Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
+                          .AllowAnyHeader(); // Allow all headers
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -32,6 +46,9 @@ namespace DentalShopWebApi
             }
 
             app.UseHttpsRedirection();
+
+            // Enable CORS
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthorization();
 
