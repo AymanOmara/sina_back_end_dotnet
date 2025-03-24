@@ -1,4 +1,5 @@
 ﻿
+using DentalShopWebApi.AllServices;
 using DentalShopWebApi.DAL;
 using DentalShopWebApi.Models;
 using Microsoft.AspNetCore.Http;
@@ -13,16 +14,36 @@ namespace DentalShopWebApi.Controllers
     {
 
         private readonly db_aa382a_ibnsinadentalContext _context;
+        private readonly Services _services;
 
-        public UserController(db_aa382a_ibnsinadentalContext context)
+        public UserController(db_aa382a_ibnsinadentalContext context  , Services services)
         {
             _context = context;
+            this._services = services;
         }
+
+
+        // Get: api/User/getAllUsers
+        [HttpGet("GetAllUsers")]
+        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+        {
+         var users =  await _context.Users.ToListAsync();
+            return Ok(users);
+        }
+
 
         // POST: api/User/CreateAccount
         [HttpPost("CreateAccount")]
         public async Task<ActionResult<User>> CreateAccount([FromBody] User user)
         {
+            if (user.Userphoto != null)
+            {
+                string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
+                if (imageUrl == null)
+                    return BadRequest("Invalid image data");
+
+                user.Userphoto = imageUrl;
+            }
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return Ok(user);
@@ -32,9 +53,21 @@ namespace DentalShopWebApi.Controllers
         [HttpPut("UpdateAccountInfo/{id}")]
         public async Task<IActionResult> UpdateAccountInfo(int id, [FromBody] User user)
         {
-            if (id != user.Userid)
+            var existingUser = await _context.Users.FindAsync(id);
+            if (existingUser == null)
+                return NotFound("user not found");
+
+            if (!string.IsNullOrEmpty(existingUser.Userphoto))
             {
-                return BadRequest();
+                var res = await _services.DeleteImageAsync(existingUser.Userphoto);
+                if (res)
+                {
+                    string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
+                    if (imageUrl == null)
+                        return BadRequest("Invalid image data");
+
+                    existingUser.Userphoto = imageUrl;
+                }
             }
 
             _context.Entry(user).State = EntityState.Modified;
@@ -68,9 +101,15 @@ namespace DentalShopWebApi.Controllers
                 return NotFound();
             }
 
+            if (!string.IsNullOrEmpty(user.Userphoto))
+            {
+
+                var res = await _services.DeleteImageAsync(user.Userphoto);
+            }
+
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-            return Ok(new {success = true});
+            return Ok();
         }
     }
 

@@ -16,6 +16,25 @@ namespace DentalShopWebApi.Controllers
             _context = context;
         }
 
+        // GET: api/Orders/GetAllOrders
+        [HttpGet("GetAllOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .OrderByDescending(o => o.Orderid)
+                    .ToListAsync();
+
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
         // POST: api/Orders/MakeOrder
         [HttpPost("MakeOrder")]
         public async Task<ActionResult<Order>> MakeOrder([FromBody] OrderRequest orderRequest)
@@ -74,10 +93,7 @@ namespace DentalShopWebApi.Controllers
         {
             try
             {
-                if (id != orderRequest.OrderId)
-                {
-                    return BadRequest("Order ID mismatch.");
-                }
+               
 
                 // Step 1: Update the order
                 var order = await _context.Orders.FindAsync(id);

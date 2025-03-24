@@ -1,4 +1,5 @@
-﻿using DentalShopWebApi.DAL;
+﻿using DentalShopWebApi.AllServices;
+using DentalShopWebApi.DAL;
 using DentalShopWebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace DentalShopWebApi.Controllers
     public class PannerController : ControllerBase
     {
         private readonly db_aa382a_ibnsinadentalContext _context;
+        private readonly Services _services;
 
-        public PannerController(db_aa382a_ibnsinadentalContext context)
+        public PannerController(db_aa382a_ibnsinadentalContext context , , Services services)
         {
             _context = context;
+            this._services = services;
         }
 
         // GET: api/Panner/GetPanner
@@ -28,9 +31,70 @@ namespace DentalShopWebApi.Controllers
         [HttpPost("AddPanner")]
         public async Task<ActionResult<Panner>> AddPanner([FromBody] Panner panner)
         {
+            if (panner.Link != null)
+            {
+                string imageUrl = await _services.SaveImageAsync(panner.Link, Guid.NewGuid(), "1", "panner");
+                if (imageUrl == null)
+                    return BadRequest("Invalid image data");
+
+                panner.Link = imageUrl;
+            }
             _context.Panners.Add(panner);
             await _context.SaveChangesAsync();
-            return Ok( panner);
+            return Ok(panner);
         }
+
+
+        // PUT: api/Panner/UpdatePanner/{id}
+        [HttpPut("UpdatePanner/{id}")]
+        public async Task<IActionResult> UpdatePanner(int id, [FromBody] Panner UpdatedPanner)
+        {
+
+
+            var existingPanner = await _context.Panners.FindAsync(id);
+            if (existingPanner == null)
+                return NotFound("Panner not found");
+
+            if (!string.IsNullOrEmpty(UpdatedPanner.Link))
+            {
+                var res = await _services.DeleteImageAsync(existingPanner.Link);
+                if (res)
+                {
+                    string imageUrl = await _services.SaveImageAsync(UpdatedPanner.Link, Guid.NewGuid(), "1", "panner");
+                    if (imageUrl == null)
+                        return BadRequest("Invalid image data");
+
+                    existingPanner.Link = imageUrl;
+                }
+            }
+
+            _context.Entry(existingPanner).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(existingPanner);
+        }
+
+        // DELETE: api/Panner/DeletePanner/{id}
+        [HttpDelete("DeletePanner/{id}")]
+        public async Task<IActionResult> DeletePanner(int id)
+        {
+            var panner = await _context.Panners.FindAsync(id);
+            if (panner == null)
+                return NotFound("Panner not found");
+
+            if (!string.IsNullOrEmpty(panner.Link))
+            {
+
+                var res = await _services.DeleteImageAsync(panner.Link);
+            }
+           
+                _context.Panners.Remove(panner);
+                await _context.SaveChangesAsync();
+
+                return Ok("Panner deleted successfully");
+           
+        }
+
+
     }
 }

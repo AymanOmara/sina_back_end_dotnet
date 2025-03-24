@@ -64,16 +64,20 @@ namespace DentalShopWebApi.Controllers
         [HttpPost("AddProduct")]
         public async Task<ActionResult<Prouduct>> AddProduct([FromBody] Prouduct product)
         {
+            if(product.Firstphoto != null)
+            {
                 string imageUrl = await _services.SaveImageAsync(product.Firstphoto, Guid.NewGuid(), "1", "product");
                 if (imageUrl == null)
                     return BadRequest("Invalid image data");
 
            
-            product.Firstphoto = imageUrl;
-            product.Secondphoto = imageUrl;
-            product.Thirdphoto = imageUrl;
-            product.Fourthphoto = imageUrl;
-            product.Fifthphoto = imageUrl;
+                product.Firstphoto = imageUrl;
+                product.Secondphoto = imageUrl;
+                product.Thirdphoto = imageUrl;
+                product.Fourthphoto = imageUrl;
+                product.Fifthphoto = imageUrl;
+
+            }
 
             _context.Prouducts.Add(product);
             await _context.SaveChangesAsync();
@@ -111,8 +115,7 @@ namespace DentalShopWebApi.Controllers
         [HttpPut("UpdateProduct/{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] Prouduct updatedProduct)
         {
-            if (id != updatedProduct.Productid)
-                return BadRequest("Product ID mismatch");
+
 
             var existingProduct = await _context.Prouducts.FindAsync(id);
             if (existingProduct == null)
@@ -132,7 +135,7 @@ namespace DentalShopWebApi.Controllers
 
             if (!string.IsNullOrEmpty(updatedProduct.Firstphoto))
             {
-              var res = await  _services.DeleteImageAsync(updatedProduct.Firstphoto);
+              var res = await  _services.DeleteImageAsync(existingProduct.Firstphoto);
                 if (res)
                 {
                     string imageUrl = await _services.SaveImageAsync(updatedProduct.Firstphoto, Guid.NewGuid(), "1", "product");
@@ -163,9 +166,14 @@ namespace DentalShopWebApi.Controllers
             if (product == null)
                 return NotFound();
 
-            _context.Prouducts.Remove(product);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            if (!string.IsNullOrEmpty(product.Firstphoto))
+            {
+                await _services.DeleteImageAsync(product.Firstphoto);
+            }
+                _context.Prouducts.Remove(product);
+                await _context.SaveChangesAsync();
+                return Ok();
+
         }
 
 
