@@ -21,9 +21,18 @@ namespace DentalShopWebApi.Controllers
         [HttpGet("GetOrderProducts/{orderId}")]
         public async Task<ActionResult<IEnumerable<Orderprouductlist>>> GetOrderProducts(int orderId)
         {
-            return await _context.Orderprouductlists
-                .Where(op => op.Orderid == orderId)
-                .ToListAsync();
+            try
+            {
+
+                return await _context.Orderprouductlists
+                    .Where(op => op.Orderid == orderId)
+                    .ToListAsync();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

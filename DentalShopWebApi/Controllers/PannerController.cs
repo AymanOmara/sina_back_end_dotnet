@@ -14,7 +14,7 @@ namespace DentalShopWebApi.Controllers
         private readonly db_aa382a_ibnsinadentalContext _context;
         private readonly Services _services;
 
-        public PannerController(db_aa382a_ibnsinadentalContext context , , Services services)
+        public PannerController(db_aa382a_ibnsinadentalContext context , Services services)
         {
             _context = context;
             this._services = services;
@@ -24,24 +24,40 @@ namespace DentalShopWebApi.Controllers
         [HttpGet("GetPanner")]
         public async Task<ActionResult<IEnumerable<Panner>>> GetPanner()
         {
-            return await _context.Panners.ToListAsync();
+            try
+            {
+                return await _context.Panners.ToListAsync();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // POST: api/Panner/AddPanner
         [HttpPost("AddPanner")]
         public async Task<ActionResult<Panner>> AddPanner([FromBody] Panner panner)
         {
-            if (panner.Link != null)
+            try
             {
-                string imageUrl = await _services.SaveImageAsync(panner.Link, Guid.NewGuid(), "1", "panner");
-                if (imageUrl == null)
-                    return BadRequest("Invalid image data");
 
-                panner.Link = imageUrl;
+                if (panner.Link != null)
+                {
+                    string imageUrl = await _services.SaveImageAsync(panner.Link, Guid.NewGuid(), "1", "panner");
+                    if (imageUrl == null)
+                        return BadRequest("Invalid image data");
+
+                    panner.Link = imageUrl;
+                }
+                _context.Panners.Add(panner);
+                await _context.SaveChangesAsync();
+                return Ok(panner);
             }
-            _context.Panners.Add(panner);
-            await _context.SaveChangesAsync();
-            return Ok(panner);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -49,49 +65,64 @@ namespace DentalShopWebApi.Controllers
         [HttpPut("UpdatePanner/{id}")]
         public async Task<IActionResult> UpdatePanner(int id, [FromBody] Panner UpdatedPanner)
         {
-
-
-            var existingPanner = await _context.Panners.FindAsync(id);
-            if (existingPanner == null)
-                return NotFound("Panner not found");
-
-            if (!string.IsNullOrEmpty(UpdatedPanner.Link))
+            try
             {
-                var res = await _services.DeleteImageAsync(existingPanner.Link);
-                if (res)
-                {
-                    string imageUrl = await _services.SaveImageAsync(UpdatedPanner.Link, Guid.NewGuid(), "1", "panner");
-                    if (imageUrl == null)
-                        return BadRequest("Invalid image data");
 
-                    existingPanner.Link = imageUrl;
+                var existingPanner = await _context.Panners.FindAsync(id);
+                if (existingPanner == null)
+                    return NotFound("Panner not found");
+
+                if (!string.IsNullOrEmpty(UpdatedPanner.Link))
+                {
+                    var res = await _services.DeleteImageAsync(existingPanner.Link);
+                    if (res)
+                    {
+                        string imageUrl = await _services.SaveImageAsync(UpdatedPanner.Link, Guid.NewGuid(), "1", "panner");
+                        if (imageUrl == null)
+                            return BadRequest("Invalid image data");
+
+                        existingPanner.Link = imageUrl;
+                    }
                 }
+
+                _context.Entry(existingPanner).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok(existingPanner);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
 
-            _context.Entry(existingPanner).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return Ok(existingPanner);
         }
 
         // DELETE: api/Panner/DeletePanner/{id}
         [HttpDelete("DeletePanner/{id}")]
         public async Task<IActionResult> DeletePanner(int id)
         {
-            var panner = await _context.Panners.FindAsync(id);
-            if (panner == null)
-                return NotFound("Panner not found");
-
-            if (!string.IsNullOrEmpty(panner.Link))
+            try
             {
 
-                var res = await _services.DeleteImageAsync(panner.Link);
-            }
-           
-                _context.Panners.Remove(panner);
-                await _context.SaveChangesAsync();
+                var panner = await _context.Panners.FindAsync(id);
+                if (panner == null)
+                    return NotFound("Panner not found");
 
-                return Ok("Panner deleted successfully");
+                if (!string.IsNullOrEmpty(panner.Link))
+                {
+
+                    var res = await _services.DeleteImageAsync(panner.Link);
+                }
+           
+                    _context.Panners.Remove(panner);
+                    await _context.SaveChangesAsync();
+
+                    return Ok("Panner deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
            
         }
 

@@ -27,8 +27,17 @@ namespace DentalShopWebApi.Controllers
         [HttpGet("GetAllUsers")]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
-         var users =  await _context.Users.ToListAsync();
-            return Ok(users);
+            try
+            {
+              
+                var users =  await _context.Users.ToListAsync();
+                return Ok(users);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -36,80 +45,115 @@ namespace DentalShopWebApi.Controllers
         [HttpPost("CreateAccount")]
         public async Task<ActionResult<User>> CreateAccount([FromBody] User user)
         {
-            if (user.Userphoto != null)
+            try
             {
-                string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
-                if (imageUrl == null)
-                    return BadRequest("Invalid image data");
 
-                user.Userphoto = imageUrl;
+                if (user.Userphoto != null)
+                {
+                    string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
+                    if (imageUrl == null)
+                        return BadRequest("Invalid image data");
+
+                    user.Userphoto = imageUrl;
+                }
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                return Ok(user);
+
             }
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return Ok(user);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // PUT: api/User/UpdateAccountInfo/5
         [HttpPut("UpdateAccountInfo/{id}")]
         public async Task<IActionResult> UpdateAccountInfo(int id, [FromBody] User user)
         {
-            var existingUser = await _context.Users.FindAsync(id);
-            if (existingUser == null)
-                return NotFound("user not found");
-
-            if (!string.IsNullOrEmpty(existingUser.Userphoto))
+            try
             {
-                var res = await _services.DeleteImageAsync(existingUser.Userphoto);
-                if (res)
+
+
+                var existingUser = await _context.Users.FindAsync(id);
+                if (existingUser == null)
+                    return NotFound("user not found");
+
+                if (!string.IsNullOrEmpty(existingUser.Userphoto))
                 {
-                    string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
-                    if (imageUrl == null)
-                        return BadRequest("Invalid image data");
+                    var res = await _services.DeleteImageAsync(existingUser.Userphoto);
+                    if (res)
+                    {
+                        string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
+                        if (imageUrl == null)
+                            return BadRequest("Invalid image data");
 
-                    existingUser.Userphoto = imageUrl;
+                        existingUser.Userphoto = imageUrl;
+                    }
                 }
-            }
 
-            _context.Entry(user).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return NoContent();
+                _context.Entry(user).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // POST: api/User/Login
         [HttpPost("Login")]
         public async Task<ActionResult<User>> Login([FromBody] LoginModel login)
         {
-            var user = await _context.Users
-                .Where(u => (u.Useremail == login.Identifier || u.Userphone == login.Identifier) && u.Userpassword == login.Password)
-                .FirstOrDefaultAsync();
-
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
 
-            return user;
+                var user = await _context.Users
+                    .Where(u => (u.Useremail == login.Identifier || u.Userphone == login.Identifier) && u.Userpassword == login.Password)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // DELETE: api/User/DeleteAccount/5
         [HttpDelete("DeleteAccount/{id}")]
         public async Task<IActionResult> DeleteAccount(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            if (!string.IsNullOrEmpty(user.Userphoto))
+            try
             {
 
-                var res = await _services.DeleteImageAsync(user.Userphoto);
-            }
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return Ok();
+                if (!string.IsNullOrEmpty(user.Userphoto))
+                {
+
+                    var res = await _services.DeleteImageAsync(user.Userphoto);
+                }
+
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 

@@ -21,11 +21,20 @@ namespace DentalShopWebApi.Controllers
         [HttpGet("GetMainInfo")]
         public async Task<ActionResult<Maininfo>> GetMainInfo()
         {
-            var mainInfo = await _context.Maininfos.FirstOrDefaultAsync();
-            if (mainInfo == null)
-                return NotFound("MainInfo not found");
+            try
+            {
+                var mainInfo = await _context.Maininfos.FirstOrDefaultAsync();
+                if (mainInfo == null)
+                    return NotFound("MainInfo not found");
 
-            return Ok(mainInfo);
+                return Ok(mainInfo);
+               
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
         }
 
         //// POST: api/MainInfo/AddMainInfo
@@ -43,15 +52,23 @@ namespace DentalShopWebApi.Controllers
         [HttpPut("UpdateMainInfo")]
         public async Task<IActionResult> UpdateMainInfo([FromBody] Maininfo mainInfo)
         {
-            var existingMainInfo = await _context.Maininfos.FirstOrDefaultAsync();
-            if (existingMainInfo == null)
-                return NotFound("MainInfo not found");
+            try
+            {
 
-            existingMainInfo.Cairofees = mainInfo.Cairofees;
-            existingMainInfo.OutCairoFees = mainInfo.OutCairoFees;
+                var existingMainInfo = await _context.Maininfos.FirstOrDefaultAsync();
+                if (existingMainInfo == null)
+                    return NotFound("MainInfo not found");
 
-            await _context.SaveChangesAsync();
-            return Ok(existingMainInfo);
+                existingMainInfo.Cairofees = mainInfo.Cairofees;
+                existingMainInfo.OutCairoFees = mainInfo.OutCairoFees;
+
+                await _context.SaveChangesAsync();
+                return Ok(existingMainInfo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
