@@ -52,7 +52,7 @@ namespace DentalShopWebApi.Controllers
                 {
                     string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
                     if (imageUrl == null)
-                        return BadRequest("Invalid image data");
+                        // return BadRequest("Invalid image data");
 
                     user.Userphoto = imageUrl;
                 }
@@ -161,6 +161,8 @@ namespace DentalShopWebApi.Controllers
     {
         public string Identifier { get; set; }
         public string Password { get; set; }
+        
+        public string FcmToken { get; set; }
     }
 
 }

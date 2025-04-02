@@ -1,4 +1,5 @@
 ﻿using DentalShopWebApi.DAL;
+using DentalShopWebApi.dto;
 using DentalShopWebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,6 @@ namespace DentalShopWebApi.Controllers
                     .Where(n => n.Userid == userId && n.Timemark == "True")
                     .OrderByDescending(n => n.Notificationid)
                     .ToListAsync();
-
             }
             catch (Exception ex)
             {
@@ -41,10 +41,9 @@ namespace DentalShopWebApi.Controllers
         {
             try
             {
-
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();
-                return Ok( notification);
+                return Ok(notification);
             }
             catch (Exception ex)
             {
@@ -58,7 +57,6 @@ namespace DentalShopWebApi.Controllers
         {
             try
             {
-
                 var notification = await _context.Notifications.FindAsync(id);
                 if (notification == null)
                 {
@@ -75,6 +73,18 @@ namespace DentalShopWebApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    }
-}
 
+        [HttpPost("RegisterFCMToken")]
+        public async Task<ActionResult<BaseResponse<bool>>> RegisterUserFcm(RegisterFcmToken request)
+        {
+            return Ok(new BaseResponse<bool>
+            {
+                Data = true,
+                Message = "OK",
+                Success = true,
+            });
+        }
+    }
+
+    public record RegisterFcmToken(string FcmToken, int UserId);
+}
