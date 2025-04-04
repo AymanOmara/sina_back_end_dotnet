@@ -38,4 +38,7 @@ public partial class User
 
     [Column("createon")]
     public DateTime? Createon { get; set; }
+
+    [Column("FCMToken")]
+    public string FCMToken { get; set; }
 }

@@ -72,32 +72,32 @@ public partial class Prouduct
     public decimal? Discount { get; set; }
 
     [Column("firstphoto")]
-    [StringLength(1024)]
+    [StringLength(2048)]
     [Unicode(false)]
     public string Firstphoto { get; set; }
 
     [Column("secondphoto")]
-    [StringLength(1024)]
+    [StringLength(2048)]
     [Unicode(false)]
     public string Secondphoto { get; set; }
 
     [Column("thirdphoto")]
-    [StringLength(1024)]
+    [StringLength(2048)]
     [Unicode(false)]
     public string Thirdphoto { get; set; }
 
     [Column("fourthphoto")]
-    [StringLength(1024)]
+    [StringLength(2048)]
     [Unicode(false)]
     public string Fourthphoto { get; set; }
 
     [Column("fifthphoto")]
-    [StringLength(1024)]
+    [StringLength(2048)]
     [Unicode(false)]
     public string Fifthphoto { get; set; }
 
     [Column("sixthphoto")]
-    [StringLength(1024)]
+    [StringLength(2048)]
     [Unicode(false)]
     public string Sixthphoto { get; set; }
 
