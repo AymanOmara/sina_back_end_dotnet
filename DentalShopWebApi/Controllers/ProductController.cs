@@ -1,5 +1,6 @@
 ﻿using DentalShopWebApi.AllServices;
 using DentalShopWebApi.DAL;
+using DentalShopWebApi.dto;
 using DentalShopWebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -140,6 +141,7 @@ namespace DentalShopWebApi.Controllers
                 {
                     return NotFound();
                 }
+
                 _context.Usersprouducts.Remove(favorite);
                 await _context.SaveChangesAsync();
                 var product = await _context.Prouducts.FindAsync(favorite.Prouductid);
@@ -209,7 +211,7 @@ namespace DentalShopWebApi.Controllers
                 _context.Entry(existingProduct).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
-                return Ok();
+                return Ok(existingProduct);
             }
             catch (Exception ex)
             {
@@ -234,7 +236,12 @@ namespace DentalShopWebApi.Controllers
 
                 _context.Prouducts.Remove(product);
                 await _context.SaveChangesAsync();
-                return Ok();
+                return Ok(new BaseResponse<bool>
+                {
+                    Data = true,
+                    Success = true,
+                    Message = "Product deleted",
+                });
             }
             catch (Exception ex)
             {
