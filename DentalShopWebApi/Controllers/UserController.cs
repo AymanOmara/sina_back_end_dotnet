@@ -155,6 +155,23 @@ namespace DentalShopWebApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        //// test images
+        //[HttpPost("AddImage")]
+        //public async Task<IActionResult> AddImage([FromBody]string base64Image)
+        //{
+        //    try
+        //    {
+        //       await _services.SaveImageAsync(base64Image,Guid.NewGuid(),"-1","images");
+
+        //    }
+        //    catch(Exception ex)
+        //    {
+
+        //    }
+        //    return Ok();
+        //}
+
     }
 
     public class LoginModel

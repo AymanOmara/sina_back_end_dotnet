@@ -28,6 +28,12 @@ namespace DentalShopWebApi.AllServices
                 if (string.IsNullOrWhiteSpace(base64Image))
                     return null;
 
+                // Remove data URI scheme prefix if present
+                if (base64Image.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+                {
+                    var base64Parts = base64Image.Split(',');
+                    base64Image = base64Parts.Length > 1 ? base64Parts[1] : base64Image;
+                }
                 // Convert base64 string to byte array
                 byte[] pictureBytes = Convert.FromBase64String(base64Image);
 
