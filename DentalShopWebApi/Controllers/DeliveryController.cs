@@ -28,5 +28,21 @@ namespace DentalShopWebApi.Controllers
 
             return mainInfo;
         }
+
+        [HttpPost("UpdateDeliveryFees")]
+        public async Task<ActionResult<Maininfo>> UpdateDeliveryFees(Maininfo request)
+        {
+            var mainInfo = await _context.Maininfos.FirstOrDefaultAsync();
+            if (mainInfo == null)
+            {
+                return NotFound();
+            }
+            _context.Maininfos.Add(request);
+            mainInfo.OutCairoFees = request.OutCairoFees;
+            mainInfo.Cairofees = request.Cairofees;
+            _context.Entry(mainInfo).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(mainInfo);
+        }
     }
 }
