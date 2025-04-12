@@ -57,7 +57,8 @@ namespace DentalShopWebApi.Controllers
                     Ordercompletetime = orderRequest.OrderCompleteTime,
                     Useravilabletime = orderRequest.UserAvilableTime,
                     Orderamount = orderRequest.OrderAmount,
-                    Ordergovernorate = orderRequest.OrderGovernorate
+                    Ordergovernorate = orderRequest.OrderGovernorate,
+                    OrderUserName = orderRequest.OrderUserName
                 };
 
                 _context.Orders.Add(order);
@@ -93,8 +94,6 @@ namespace DentalShopWebApi.Controllers
         {
             try
             {
-               
-
                 // Step 1: Update the order
                 var order = await _context.Orders.FindAsync(id);
                 if (order == null)
@@ -202,6 +201,7 @@ namespace DentalShopWebApi.Controllers
         public DateTime? OrderExcuteTime { get; set; }
         public DateTime? OrderCompleteTime { get; set; }
         public string UserAvilableTime { get; set; }
+        public string OrderUserName { get; set; } = string.Empty;
         public int OrderAmount { get; set; }
         public string OrderGovernorate { get; set; }
         public List<OrderProductDto> OrderProducts { get; set; }
