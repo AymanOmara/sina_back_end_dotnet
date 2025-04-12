@@ -37,14 +37,14 @@ namespace DentalShopWebApi.Controllers
 
         }
 
-        //// POST: api/MainInfo/AddMainInfo
-        //[HttpPost("AddMainInfo")]
-        //public async Task<ActionResult<Maininfo>> AddMainInfo([FromBody] Maininfo mainInfo)
-        //{
-        //    _context.Maininfos.Add(mainInfo);
-        //    await _context.SaveChangesAsync();
-        //    return Ok(mainInfo);
-        //}
+        // POST: api/MainInfo/AddMainInfo
+        [HttpPost("AddMainInfo")]
+        public async Task<ActionResult<Maininfo>> AddMainInfo([FromBody] Maininfo mainInfo)
+        {
+            _context.Maininfos.Add(mainInfo);
+            await _context.SaveChangesAsync();
+            return Ok(mainInfo);
+        }
 
 
 
@@ -73,18 +73,18 @@ namespace DentalShopWebApi.Controllers
 
 
 
-        //// DELETE: api/MainInfo/DeleteMainInfo
-        //[HttpDelete("DeleteMainInfo")]
-        //public async Task<IActionResult> DeleteMainInfo()
-        //{
-        //    var mainInfo = await _context.Maininfos.FirstOrDefaultAsync();
-        //    if (mainInfo == null)
-        //        return NotFound("MainInfo not found");
+        // DELETE: api/MainInfo/DeleteMainInfo
+        [HttpDelete("DeleteMainInfo/{id}")]
+        public async Task<IActionResult> DeleteMainInfo(int id)
+        {
+            var mainInfo = await _context.Maininfos.FirstOrDefaultAsync(x=>x.Id == id);
+            if (mainInfo == null)
+                return NotFound("MainInfo not found");
 
-        //    _context.Maininfos.Remove(mainInfo);
-        //    await _context.SaveChangesAsync();
+            _context.Maininfos.Remove(mainInfo);
+            await _context.SaveChangesAsync();
 
-        //    return Ok("MainInfo deleted successfully");
-        //}
+            return Ok("MainInfo deleted successfully");
+        }
     }
 }

@@ -41,6 +41,11 @@ namespace DentalShopWebApi.Controllers
         {
             try
             {
+                var user = _context.Users.FirstOrDefault(u=>u.Userid == orderRequest.UserId);
+                if (user == null)
+                {
+                    return BadRequest("user id is not right");
+                }
                 // Step 1: Create the order
                 var order = new Order
                 {
@@ -58,7 +63,8 @@ namespace DentalShopWebApi.Controllers
                     Useravilabletime = orderRequest.UserAvilableTime,
                     Orderamount = orderRequest.OrderAmount,
                     Ordergovernorate = orderRequest.OrderGovernorate,
-                    OrderUserName = orderRequest.OrderUserName
+                    OrderUserName = orderRequest.OrderUserName,
+                    UserName = user.Username,
                 };
 
                 _context.Orders.Add(order);
@@ -94,6 +100,12 @@ namespace DentalShopWebApi.Controllers
         {
             try
             {
+                var user = _context.Users.FirstOrDefault(u => u.Userid == orderRequest.UserId);
+                if (user == null)
+                {
+                    return BadRequest("user id is not right");
+                }
+
                 // Step 1: Update the order
                 var order = await _context.Orders.FindAsync(id);
                 if (order == null)
@@ -115,6 +127,7 @@ namespace DentalShopWebApi.Controllers
                 order.Useravilabletime = orderRequest.UserAvilableTime;
                 order.Orderamount = orderRequest.OrderAmount;
                 order.Ordergovernorate = orderRequest.OrderGovernorate;
+                order.UserName = user.Username;
 
                 _context.Entry(order).State = EntityState.Modified;
 
