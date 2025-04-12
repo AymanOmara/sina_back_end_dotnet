@@ -18,6 +18,9 @@ public partial class Order
     [Column("userid")]
     public int? Userid { get; set; }
 
+    [Column("username")]
+    public string UserName { get; set; }
+
     [Column("ordertime")]
     public DateTime? Ordertime { get; set; }
 

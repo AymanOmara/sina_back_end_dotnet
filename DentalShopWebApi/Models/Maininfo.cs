@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DentalShopWebApi.Models;
 
-[Keyless]
+
 [Table("maininfo")]
 public partial class Maininfo
 {
@@ -16,4 +16,8 @@ public partial class Maininfo
     public int? Cairofees { get; set; }
 
     public int? OutCairoFees { get; set; }
+
+    [Key]
+    [Column("id")]
+    public int Id { get; set; }
 }
