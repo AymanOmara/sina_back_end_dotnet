@@ -13,7 +13,7 @@ namespace DentalShopWebApi.Models;
 public partial class Panner
 {
     [Column("link")]
-    [Unicode(false)]
+    //[Unicode(false)]
     public string Link { get; set; }
 
     [Column("id")]

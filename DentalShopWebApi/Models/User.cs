@@ -32,8 +32,8 @@ public partial class User
     public string Userphone { get; set; }
 
     [Column("userphoto")]
-    [StringLength(2048)]
-    [Unicode(false)]
+    //[StringLength(2048)]
+    //[Unicode(false)]
     public string Userphoto { get; set; }
 
     [Column("createon")]
