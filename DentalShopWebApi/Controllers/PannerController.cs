@@ -75,14 +75,14 @@ namespace DentalShopWebApi.Controllers
                 if (!string.IsNullOrEmpty(UpdatedPanner.Link))
                 {
                     var res = await _services.DeleteImageAsync(existingPanner.Link);
-                    if (res)
-                    {
+                    //if (res)
+                    //{
                         string imageUrl = await _services.SaveImageAsync(UpdatedPanner.Link, Guid.NewGuid(), "1", "panner");
                         if (imageUrl == null)
                             return BadRequest("Invalid image data");
 
                         existingPanner.Link = imageUrl;
-                    }
+                    //}
                 }
 
                 _context.Entry(existingPanner).State = EntityState.Modified;
