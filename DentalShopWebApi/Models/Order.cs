@@ -67,7 +67,4 @@ public partial class Order
 
     [Column("ordergovernorate")]
     public string Ordergovernorate { get; set; }
-    
-    [Column("OrderUserName")]
-    public string OrderUserName { get; set; }
 }

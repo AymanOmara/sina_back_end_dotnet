@@ -63,7 +63,6 @@ namespace DentalShopWebApi.Controllers
                     Useravilabletime = orderRequest.UserAvilableTime,
                     Orderamount = orderRequest.OrderAmount,
                     Ordergovernorate = orderRequest.OrderGovernorate,
-                    OrderUserName = orderRequest.OrderUserName,
                     UserName = user.Username,
                 };
 
@@ -154,7 +153,7 @@ namespace DentalShopWebApi.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return NoContent();
+                return Ok(order);
             }
             catch (Exception ex)
             {

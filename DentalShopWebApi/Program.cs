@@ -51,7 +51,7 @@ namespace DentalShopWebApi
             app.UseCors("AllowAllOrigins");
 
             app.UseAuthorization();
-
+            app.UseStaticFiles();
 
             app.MapControllers();
 

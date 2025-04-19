@@ -37,7 +37,6 @@ namespace DentalShopWebApi.Controllers
 
         }
 
-        // POST: api/MainInfo/AddMainInfo
         [HttpPost("AddMainInfo")]
         public async Task<ActionResult<Maininfo>> AddMainInfo([FromBody] Maininfo mainInfo)
         {
@@ -45,7 +44,7 @@ namespace DentalShopWebApi.Controllers
             await _context.SaveChangesAsync();
             return Ok(mainInfo);
         }
-
+        // POST: api/MainInfo/AddMainInfo
 
 
         // PUT: api/MainInfo/UpdateMainInfo
