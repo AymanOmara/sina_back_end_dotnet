@@ -193,8 +193,8 @@ namespace DentalShopWebApi.Controllers
                 if (!string.IsNullOrEmpty(updatedProduct.Firstphoto))
                 {
                     var res = await _services.DeleteImageAsync(existingProduct.Firstphoto);
-                    if (res)
-                    {
+                    //if (res)
+                    //{
                         string imageUrl = await _services.SaveImageAsync(updatedProduct.Firstphoto, Guid.NewGuid(), "1",
                             "product");
                         if (imageUrl == null)
@@ -205,7 +205,7 @@ namespace DentalShopWebApi.Controllers
                         existingProduct.Thirdphoto = imageUrl;
                         existingProduct.Fourthphoto = imageUrl;
                         existingProduct.Fifthphoto = imageUrl;
-                    }
+                    //}
                 }
 
                 _context.Entry(existingProduct).State = EntityState.Modified;

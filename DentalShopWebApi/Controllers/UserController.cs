@@ -82,14 +82,14 @@ namespace DentalShopWebApi.Controllers
                 if (!string.IsNullOrEmpty(existingUser.Userphoto))
                 {
                     var res = await _services.DeleteImageAsync(existingUser.Userphoto);
-                    if (res)
-                    {
+                    //if (res)
+                    //{
                         string imageUrl = await _services.SaveImageAsync(user.Userphoto, Guid.NewGuid(), "1", "user");
                         if (imageUrl == null)
                             return BadRequest("Invalid image data");
 
                         existingUser.Userphoto = imageUrl;
-                    }
+                    //}
                 }
 
                 _context.Entry(user).State = EntityState.Modified;
