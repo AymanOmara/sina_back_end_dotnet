@@ -1,7 +1,11 @@
 ﻿using DentalShopWebApi.DAL;
 using DentalShopWebApi.Models;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace DentalShopWebApi.Controllers
 {
@@ -10,10 +14,12 @@ namespace DentalShopWebApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly db_aa382a_ibnsinadentalContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public OrderController(db_aa382a_ibnsinadentalContext context)
+        public OrderController(db_aa382a_ibnsinadentalContext context , IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this._webHostEnvironment = webHostEnvironment;
         }
 
         // GET: api/Orders/GetAllOrders
@@ -97,6 +103,7 @@ namespace DentalShopWebApi.Controllers
         [HttpPut("EditOrder/{id}")]
         public async Task<IActionResult> EditOrder(int id, [FromBody] OrderRequest orderRequest)
         {
+            //Accepted
             try
             {
                 var user = _context.Users.FirstOrDefault(u => u.Userid == orderRequest.UserId);
@@ -153,6 +160,23 @@ namespace DentalShopWebApi.Controllers
 
                 await _context.SaveChangesAsync();
 
+                /////////////////// handling push notification in case of accepted order 
+                var notification = new Notification();
+                notification.Userid = user.Userid;
+                notification.Notificationtext = "your order has been accepted";
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
+                // 1. Get FCM token of the user
+                //var user = await _context.Users.FirstOrDefaultAsync(u => u.Userid == notification.Userid);
+                if (user?.FCMToken != null)
+                {
+                    // 2. Send notification
+                    await SendFcmV1Notification(user.FCMToken, "Order Accepted", notification.Notificationtext);
+                }
+
+                ////////////////////////////////////////////////////////
+
                 return Ok(order);
             }
             catch (Exception ex)
@@ -197,6 +221,56 @@ namespace DentalShopWebApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+
+
+        private async Task<string> GetAccessTokenAsync()
+        {
+            GoogleCredential credential;
+            using (var stream = new FileStream(
+                    Path.Combine(_webHostEnvironment.WebRootPath, "ibn-sina-dent-f1df955b5bcd.json"),
+                    FileMode.Open,
+                    FileAccess.Read))
+            {
+                credential = GoogleCredential.FromStream(stream)
+                    .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
+            }
+
+            var token = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+            return token;
+        }
+
+        private async Task<bool> SendFcmV1Notification(string fcmToken, string title, string body)
+        {
+            var accessToken = await GetAccessTokenAsync();
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var message = new
+                {
+                    message = new
+                    {
+                        token = fcmToken,
+                        notification = new
+                        {
+                            title = title,
+                            body = body
+                        }
+                    }
+                };
+
+                var json = System.Text.Json.JsonSerializer.Serialize(message);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Replace YOUR_PROJECT_ID with your actual Firebase project ID
+                var response = await client.PostAsync($"https://fcm.googleapis.com/v1/projects/ibn-sina-dent/messages:send", content);
+                return response.IsSuccessStatusCode;
+            }
+        }
+
+
     }
 
     public class OrderRequest
