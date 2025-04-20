@@ -103,7 +103,7 @@ namespace DentalShopWebApi.Controllers
         [HttpPut("EditOrder/{id}")]
         public async Task<IActionResult> EditOrder(int id, [FromBody] OrderRequest orderRequest)
         {
-            //Accepted
+            
             try
             {
                 var user = _context.Users.FirstOrDefault(u => u.Userid == orderRequest.UserId);
@@ -161,18 +161,23 @@ namespace DentalShopWebApi.Controllers
                 await _context.SaveChangesAsync();
 
                 /////////////////// handling push notification in case of accepted order 
-                var notification = new Notification();
-                notification.Userid = user.Userid;
-                notification.Notificationtext = "your order has been accepted";
-                _context.Notifications.Add(notification);
-                await _context.SaveChangesAsync();
-
-                // 1. Get FCM token of the user
-                //var user = await _context.Users.FirstOrDefaultAsync(u => u.Userid == notification.Userid);
-                if (user?.FCMToken != null)
+                if(orderRequest.OrderStatus == "Accepted")
                 {
-                    // 2. Send notification
-                    await SendFcmV1Notification(user.FCMToken, "Order Accepted", notification.Notificationtext);
+
+                    var notification = new Notification();
+                    notification.Userid = user.Userid;
+                    notification.Notificationtext = "your order has been accepted";
+                    _context.Notifications.Add(notification);
+                    await _context.SaveChangesAsync();
+
+                    // 1. Get FCM token of the user
+                    //var user = await _context.Users.FirstOrDefaultAsync(u => u.Userid == notification.Userid);
+                    if (user?.FCMToken != null)
+                    {
+                        // 2. Send notification
+                        await SendFcmV1Notification(user.FCMToken, "Order Accepted", notification.Notificationtext);
+                    }
+
                 }
 
                 ////////////////////////////////////////////////////////
