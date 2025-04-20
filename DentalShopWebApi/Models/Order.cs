@@ -36,8 +36,6 @@ public partial class Order
     public decimal? Orderprice { get; set; }
 
     [Column("orderlocation")]
-    [StringLength(2048)]
-    [Unicode(false)]
     public string Orderlocation { get; set; }
 
     [Column("orderphone")]
